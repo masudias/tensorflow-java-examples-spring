@@ -36,3 +36,6 @@ bin/
 log/
 out/
 graph/YOLO/
+
+.DS_Store
+lib/*
