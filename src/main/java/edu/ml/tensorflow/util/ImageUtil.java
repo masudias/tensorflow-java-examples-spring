@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.awt.*;
 
 /**
  * Util class for image processing.
