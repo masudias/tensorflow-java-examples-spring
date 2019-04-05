@@ -16,7 +16,9 @@ import java.util.List;
  */
 public final class IOUtil {
     private final static Logger LOGGER = LoggerFactory.getLogger(IOUtil.class);
-    private IOUtil() {}
+
+    private IOUtil() {
+    }
 
     public static byte[] readAllBytesOrExit(final String fileName) {
         try {

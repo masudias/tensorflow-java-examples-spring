@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,6 +28,7 @@ public class ImageUtil {
 
     /**
      * It returns the singleton instance of this class.
+     *
      * @return ImageUtil instance
      */
     public static ImageUtil getInstance(final ApplicationProperties applicationProperties) {
@@ -41,7 +41,8 @@ public class ImageUtil {
 
     /**
      * Label image with classes and predictions given by the ThensorFLow
-     * @param image buffered image to label
+     *
+     * @param image        buffered image to label
      * @param recognitions list of recognized objects
      * @return location of the labeled image
      */
@@ -52,12 +53,12 @@ public class ImageUtil {
         Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
         graphics.setColor(Color.green);
 
-        for (Recognition recognition: recognitions) {
+        for (Recognition recognition : recognitions) {
             BoxPosition box = recognition.getScaledLocation(scaleX, scaleY);
             //draw text
             graphics.drawString(recognition.getTitle() + " " + recognition.getConfidence(), box.getLeft(), box.getTop() - 7);
             // draw bounding box
-            graphics.drawRect(box.getLeftInt(),box.getTopInt(), box.getWidthInt(), box.getHeightInt());
+            graphics.drawRect(box.getLeftInt(), box.getTopInt(), box.getWidthInt(), box.getHeightInt());
         }
 
         graphics.dispose();
@@ -65,14 +66,13 @@ public class ImageUtil {
     }
 
     /**
-     *
-     * @param image to save
+     * @param image  to save
      * @param target to save image
      * @return location of the labeled image
      */
     public String saveImage(final BufferedImage image, final String target) {
         try {
-            ImageIO.write(image,"jpg", new File(target));
+            ImageIO.write(image, "jpg", new File(target));
             return target;
         } catch (IOException ex) {
             LOGGER.error("Unagle to save image {}!", target);

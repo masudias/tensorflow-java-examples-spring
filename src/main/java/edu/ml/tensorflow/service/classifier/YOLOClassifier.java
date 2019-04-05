@@ -19,7 +19,7 @@ import java.util.PriorityQueue;
  */
 public class YOLOClassifier {
     private final static float OVERLAP_THRESHOLD = 0.5f;
-    private final static double anchors[] = {1.08,1.19,  3.42,4.41,  6.63,11.38,  9.42,5.11,  16.62,10.52};
+    private final static double anchors[] = {1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52};
     private final static int SIZE = 13;
     private final static int MAX_RECOGNIZED_CLASSES = 24;
     private final static float THRESHOLD = 0.5f;
@@ -27,14 +27,15 @@ public class YOLOClassifier {
     private final static int NUMBER_OF_BOUNDING_BOX = 5;
     private static YOLOClassifier classifier;
 
-    private YOLOClassifier() {}
+    private YOLOClassifier() {
+    }
 
     public static YOLOClassifier getInstance() {
         if (classifier == null) {
             classifier = new YOLOClassifier();
         }
 
-        return  classifier;
+        return classifier;
     }
 
     /**
@@ -44,26 +45,26 @@ public class YOLOClassifier {
      * @return the number of classes
      */
     public int getOutputSizeByShape(Tensor<Float> result) {
-        return (int) (result.shape()[3] * Math.pow(SIZE,2));
+        return (int) (result.shape()[3] * Math.pow(SIZE, 2));
     }
 
     /**
      * It classifies the object/objects on the image
      *
      * @param tensorFlowOutput output from the TensorFlow, it is a 13x13x((num_class +1) * 5) tensor
-     * 125 = (numClass +  Tx, Ty, Tw, Th, To) * 5 - cause we have 5 boxes per each cell
-     * @param labels a string vector with the labels
+     *                         125 = (numClass +  Tx, Ty, Tw, Th, To) * 5 - cause we have 5 boxes per each cell
+     * @param labels           a string vector with the labels
      * @return a list of recognition objects
      */
     public List<Recognition> classifyImage(final float[] tensorFlowOutput, final List<String> labels) {
-        int numClass = (int) (tensorFlowOutput.length / (Math.pow(SIZE,2) * NUMBER_OF_BOUNDING_BOX) - 5);
+        int numClass = (int) (tensorFlowOutput.length / (Math.pow(SIZE, 2) * NUMBER_OF_BOUNDING_BOX) - 5);
         BoundingBox[][][] boundingBoxPerCell = new BoundingBox[SIZE][SIZE][NUMBER_OF_BOUNDING_BOX];
         PriorityQueue<Recognition> priorityQueue = new PriorityQueue(MAX_RECOGNIZED_CLASSES, new RecognitionComparator());
 
         int offset = 0;
-        for (int cy=0; cy<SIZE; cy++) {        // SIZE * SIZE cells
-            for (int cx=0; cx<SIZE; cx++) {
-                for (int b=0; b<NUMBER_OF_BOUNDING_BOX; b++) {   // 5 bounding boxes per each cell
+        for (int cy = 0; cy < SIZE; cy++) {        // SIZE * SIZE cells
+            for (int cx = 0; cx < SIZE; cx++) {
+                for (int b = 0; b < NUMBER_OF_BOUNDING_BOX; b++) {   // 5 bounding boxes per each cell
                     boundingBoxPerCell[cx][cy][b] = getModel(tensorFlowOutput, cx, cy, b, numClass, offset);
                     calculateTopPredictions(boundingBoxPerCell[cx][cy][b], priorityQueue, labels);
                     offset = offset + numClass + 5;
@@ -85,7 +86,7 @@ public class YOLOClassifier {
 
         model.setClasses(new double[numClass]);
 
-        for (int probIndex=0; probIndex<numClass; probIndex++) {
+        for (int probIndex = 0; probIndex < numClass; probIndex++) {
             model.getClasses()[probIndex] = tensorFlowOutput[probIndex + offset + 5];
         }
 
@@ -94,7 +95,7 @@ public class YOLOClassifier {
 
     private void calculateTopPredictions(final BoundingBox boundingBox, final PriorityQueue<Recognition> predictionQueue,
                                          final List<String> labels) {
-        for (int i=0; i<boundingBox.getClasses().length; i++) {
+        for (int i = 0; i < boundingBox.getClasses().length; i++) {
             ArgMax.Result argMax = new ArgMax(new SoftMax(boundingBox.getClasses()).getValue()).getResult();
             double confidenceInClass = argMax.getMaxValue() * boundingBox.getConfidence();
             if (confidenceInClass > THRESHOLD) {
@@ -159,4 +160,3 @@ public class YOLOClassifier {
         }
     }
 }
-
